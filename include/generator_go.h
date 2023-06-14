@@ -92,6 +92,8 @@ private:
     void GenerateEnum(const std::shared_ptr<Package>& p, const std::shared_ptr<EnumType>& e, const fs::path& path);
     void GenerateFlags(const std::shared_ptr<Package>& p, const std::shared_ptr<FlagsType>& f, const fs::path& path);
     void GenerateStruct(const std::shared_ptr<Package>& p, const std::shared_ptr<StructType>& s, const fs::path& path);
+    void GenerateVariant(const std::shared_ptr<Package>& p, const std::shared_ptr<VariantType>& v, const fs::path& path);
+    void GenerateVariantFieldModel(const std::shared_ptr<Package>& p, const std::shared_ptr<VariantType>& v, const fs::path& path);
     void GenerateStructFieldModel(const std::shared_ptr<Package>& p, const std::shared_ptr<StructType>& s, const fs::path& path);
     void GenerateStructModel(const std::shared_ptr<Package>& p, const std::shared_ptr<StructType>& s, const fs::path& path);
     void GenerateStructFinalModel(const std::shared_ptr<Package>& p, const std::shared_ptr<StructType>& s, const fs::path& path);
@@ -125,6 +127,7 @@ private:
     std::string ConvertTypeFieldDeclaration(const StructField& field, bool final);
     std::string ConvertTypeFieldInitialization(const std::string& type, bool optional, const std::string& offset, bool final);
     std::string ConvertTypeFieldInitialization(const StructField& field, const std::string& offset, bool final);
+    std::string ConvertTypeFieldInitialization(const VariantValue& field, const std::string& offset);
     std::string ConvertConstant(const std::string& type, const std::string& value, bool optional);
     std::string ConvertDefault(const std::string& type, bool optional);
     std::string ConvertDefault(const StructField& field);
