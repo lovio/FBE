@@ -6324,11 +6324,20 @@ void GeneratorGo::GenerateVariantFieldModel(const std::shared_ptr<Package>& p, c
         WriteLineIndent("vfm := " + ConvertTypeFieldInitialization(*value, "4") + " // fm.FBESize() = 4");
         if (value->vector || value->list || value->map || value->hash || value->ptr) {
             // TODO(liuqi): 这里是的 FieldModelVectorXXX，哪里生成的呢？
-            WriteLineIndent("fbeValue, _ = vfm.Get()");
+            WriteLineIndent("*fbeValue, _ = vfm.Get()");
         } else if (!IsGoType(*value->type)) {
-            WriteLineIndent("vfm.GetValue(&fbeValue)");
+            // TODO(liuqi): 这里需要做类型转换
+            WriteLineIndent("if fbeValueNotInterface, ok := (*fbeValue).(" + ConvertTypeFieldType(*value->type, value->ptr) + "); ok {");
+            Indent(1);
+            WriteLineIndent("vfm.GetValue(&fbeValueNotInterface)");
+            Indent(-1);
+            WriteLineIndent("} else {");
+            Indent(1);
+            WriteLineIndent("return errors.New(\"model is broken, invalid variant_type_index\")");
+            Indent(-1);
+            WriteLineIndent("}");
         } else {
-            WriteLineIndent("fbeValue, _ = vfm.Get()");
+            WriteLineIndent("*fbeValue, _ = vfm.Get()");
         }
         Indent(-1);
     }
@@ -6391,7 +6400,7 @@ void GeneratorGo::GenerateVariantFieldModel(const std::shared_ptr<Package>& p, c
         // It's complex to pass generate fm.buffer in ConvertTypeFieldInitialization
         WriteLineIndent("buffer := fm.buffer");
         WriteLineIndent("vfm := " + ConvertTypeFieldInitialization(*value, "4") + " // fm.FBESize() = 4");
-        WriteLineIndent("if err = vfm.Set(&v); err != nil {");
+        WriteLineIndent("if err = vfm.Set(v); err != nil {");
         Indent(1);
         WriteLineIndent("return err");
         Indent(-1);
