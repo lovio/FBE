@@ -1587,9 +1587,7 @@ void GeneratorCpp::GeneratePackage_Source(const std::shared_ptr<Package>& p)
     if (p->body)
     {
 
-        if (!p->body->variants.empty()) {
-            GeneratePackage_Variant_Source(p);
-        }
+        GeneratePackage_Variant_Source(p);
 
         // Generate child structs
         GeneratePackage_Struct_Source(p);
@@ -5637,9 +5635,7 @@ void GeneratorCpp::GeneratePtrPackage_Source(const std::shared_ptr<Package>& p)
     if (p->body)
     {
 
-        if (!p->body->variants.empty()) {
-            GeneratePtrPackage_Variant_Source(p);
-        }
+        GeneratePtrPackage_Variant_Source(p);
 
         // Generate child structs
         GeneratePtrPackage_Struct_Source(p);
