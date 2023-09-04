@@ -1434,6 +1434,93 @@ void GeneratorCpp::GeneratorStructForwardDeclaration(const std::vector<std::shar
     }
 }
 
+void GeneratorCpp::GeneratePackage_Variant_Source(const std::shared_ptr<Package>& p) {
+    fs::path output = _output;
+
+    // Create package path
+    create_dir(output);
+
+    // Generate the output file
+    output /= ConvertFileName(*p->name, FileType::Struct, false, false, false, "_variants");
+    WriteBegin();
+
+
+    // Generate package source
+    GenerateSource(fs::path(_input).filename().string());
+
+    // Generate imports
+    GenerateImports(ConvertFileName(*p->name, FileType::Struct, true, false));
+
+
+    // Generate namespace begin
+    WriteLine();
+    WriteLineIndent("namespace " + ConvertNamespace(*p->name) + " {");
+    for (const auto& v : p->body->variants)
+    {
+        GenerateVariantIsEqualFunc(p, v);
+        GenerateVariantOutputStream(p, v);
+    }
+
+
+    // Generate namespace end
+    WriteLine();
+    WriteLineIndent("} // namespace " + ConvertNamespace(*p->name));
+
+    // Generate package footer
+    GenerateFooter();
+
+    // Store the output file
+    WriteEnd();
+    Store(output);
+}
+
+void GeneratorCpp::GeneratePackage_Struct_Source(const std::shared_ptr<Package>& p) {
+    fs::path output = _output;
+
+    // Create package path
+    create_dir(output);
+
+    // Generate the output file
+    output /= ConvertFileName(*p->name, FileType::Struct, false, false, false, "_structs");
+    WriteBegin();
+
+
+    // Generate package source
+    GenerateSource(fs::path(_input).filename().string());
+
+    // Generate imports
+    GenerateImports(ConvertFileName(*p->name, FileType::Struct, true, false));
+
+
+    // Generate namespace begin
+    WriteLine();
+    WriteLineIndent("namespace " + ConvertNamespace(*p->name) + " {");
+    // Generate child structs
+    for (const auto& s : p->body->structs)
+    {
+        GenerateStruct_Source(p, s);
+
+        // Generate struct output stream
+        GenerateStructOutputStream(p, s);
+
+        // Generate struct logging stream
+        if (Logging())
+            GenerateStructLoggingStream(p, s);
+    }
+
+
+    // Generate namespace end
+    WriteLine();
+    WriteLineIndent("} // namespace " + ConvertNamespace(*p->name));
+
+    // Generate package footer
+    GenerateFooter();
+
+    // Store the output file
+    WriteEnd();
+    Store(output);
+}
+
 void GeneratorCpp::GeneratePackage_Source(const std::shared_ptr<Package>& p)
 {
     fs::path output = _output;
@@ -1480,26 +1567,9 @@ void GeneratorCpp::GeneratePackage_Source(const std::shared_ptr<Package>& p)
                 GenerateFlagsLoggingStream(f);
         }
 
-        if (!p->body->variants.empty()) {
-            for (const auto& v : p->body->variants)
-            {
-                GenerateVariantOutputStream(p, v);
-            }
-            WriteLine();
-        }
 
-        // Generate child structs
-        for (const auto& s : p->body->structs)
-        {
-            GenerateStruct_Source(p, s);
 
-            // Generate struct output stream
-            GenerateStructOutputStream(p, s);
 
-            // Generate struct logging stream
-            if (Logging())
-                GenerateStructLoggingStream(p, s);
-        }
     }
 
     // Generate namespace end
@@ -1512,6 +1582,18 @@ void GeneratorCpp::GeneratePackage_Source(const std::shared_ptr<Package>& p)
     // Store the output file
     WriteEnd();
     Store(output);
+
+    // Generate namespace body
+    if (p->body)
+    {
+
+        if (!p->body->variants.empty()) {
+            GeneratePackage_Variant_Source(p);
+        }
+
+        // Generate child structs
+        GeneratePackage_Struct_Source(p);
+    }
 }
 
 void GeneratorCpp::GeneratePackage_Json(const std::shared_ptr<Package>& p)
@@ -5406,6 +5488,92 @@ void GeneratorCpp::GeneratePtrPackage_Header(const std::shared_ptr<Package>& p)
     Store(output);
 }
 
+void GeneratorCpp::GeneratePtrPackage_Variant_Source(const std::shared_ptr<Package>& p) {
+    fs::path output = _output;
+
+    // Create package path
+    create_dir(output);
+
+    // Generate the output file
+    output /= ConvertFileName(*p->name, FileType::Struct, false, true, false, "_variants");
+    WriteBegin();
+
+
+    // Generate package source
+    GenerateSource(fs::path(_input).filename().string());
+
+    // Generate imports
+    GenerateImports(ConvertFileName(*p->name, FileType::Struct, true, true));
+
+
+    // Generate namespace begin
+    WriteLine();
+    WriteLineIndent("namespace " + ConvertNamespace(*p->name) + " {");
+    for (const auto& v : p->body->variants)
+    {
+        GenerateVariantIsEqualFunc(p, v);
+        GenerateVariantOutputStream(p, v);
+    }
+
+
+    // Generate namespace end
+    WriteLine();
+    WriteLineIndent("} // namespace " + ConvertNamespace(*p->name));
+
+    // Generate package footer
+    GenerateFooter();
+
+    // Store the output file
+    WriteEnd();
+    Store(output);
+}
+
+void GeneratorCpp::GeneratePtrPackage_Struct_Source(const std::shared_ptr<Package>& p) {
+    fs::path output = _output;
+
+    // Create package path
+    create_dir(output);
+
+    // Generate the output file
+    output /= ConvertFileName(*p->name, FileType::Struct, false, true, false, "_structs");
+    WriteBegin();
+
+
+    // Generate package source
+    GenerateSource(fs::path(_input).filename().string());
+
+    // Generate imports
+    GenerateImports(ConvertFileName(*p->name, FileType::Struct, true, true));
+
+
+    // Generate namespace begin
+    WriteLine();
+    WriteLineIndent("namespace " + ConvertNamespace(*p->name) + " {");
+    for (const auto& s : p->body->structs)
+    {
+        GeneratePtrStruct_Source(p, s);
+
+        // Generate struct output stream
+        GenerateStructOutputStream(p, s);
+
+        // Generate struct logging stream
+        if (Logging())
+            GenerateStructLoggingStream(p, s);
+    }
+
+
+    // Generate namespace end
+    WriteLine();
+    WriteLineIndent("} // namespace " + ConvertNamespace(*p->name));
+
+    // Generate package footer
+    GenerateFooter();
+
+    // Store the output file
+    WriteEnd();
+    Store(output);
+}
+
 void GeneratorCpp::GeneratePtrPackage_Source(const std::shared_ptr<Package>& p)
 {
     fs::path output = _output;
@@ -5452,27 +5620,6 @@ void GeneratorCpp::GeneratePtrPackage_Source(const std::shared_ptr<Package>& p)
             if (Logging())
                 GenerateFlagsLoggingStream(f);
         }
-
-        if (!p->body->variants.empty()) {
-            for (const auto& v : p->body->variants)
-            {
-                GenerateVariantIsEqualFunc(p, v);
-                GenerateVariantOutputStream(p, v);
-            }
-        }
-
-        // Generate child structs
-        for (const auto& s : p->body->structs)
-        {
-            GeneratePtrStruct_Source(p, s);
-
-            // Generate struct output stream
-            GenerateStructOutputStream(p, s);
-
-            // Generate struct logging stream
-            if (Logging())
-                GenerateStructLoggingStream(p, s);
-        }
     }
 
     // Generate namespace end
@@ -5485,6 +5632,18 @@ void GeneratorCpp::GeneratePtrPackage_Source(const std::shared_ptr<Package>& p)
     // Store the output file
     WriteEnd();
     Store(output);
+
+    // Generate namespace body
+    if (p->body)
+    {
+
+        if (!p->body->variants.empty()) {
+            GeneratePtrPackage_Variant_Source(p);
+        }
+
+        // Generate child structs
+        GeneratePtrPackage_Struct_Source(p);
+    }
 }
 
 void GeneratorCpp::GeneratePtrPackageModels_Header(const std::shared_ptr<Package>& p)
@@ -8195,8 +8354,9 @@ std::string GeneratorCpp::ConvertNamespace(const std::string& package) {
     return package + (Arena() ? "_pmr" : ""); // we prefer _pmr over ::pmr to avoid conflicting with STL pmr
 }
 
-std::string GeneratorCpp::ConvertFileName(const std::string& package, FileType file_type, bool is_header, bool is_ptr, bool is_final) {
+std::string GeneratorCpp::ConvertFileName(const std::string& package, FileType file_type, bool is_header, bool is_ptr, bool is_final, const std::string& suffix) {
     std::string filename = package + (is_ptr ? "_ptr" : "") + (is_final ? "_final" : "");
+
     // final is in conflicting with pmr
     if (!is_final && Arena()) {
         filename += "_pmr";
@@ -8216,7 +8376,7 @@ std::string GeneratorCpp::ConvertFileName(const std::string& package, FileType f
         default:
             break;
     }
-    return filename + (is_header ? ".h" : ".cpp");
+    return filename + suffix + (is_header ? ".h" : ".cpp");
 }
 
 } // namespace FBE

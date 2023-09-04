@@ -176,8 +176,12 @@ private:
 
     void GeneratePackage_Header(const std::shared_ptr<Package>& p);
     void GeneratePackage_Source(const std::shared_ptr<Package>& p);
+    void GeneratePackage_Variant_Source(const std::shared_ptr<Package>& p);
+    void GeneratePackage_Struct_Source(const std::shared_ptr<Package>& p);
     void GeneratePtrPackage_Header(const std::shared_ptr<Package>& p);
     void GeneratePtrPackage_Source(const std::shared_ptr<Package>& p);
+    void GeneratePtrPackage_Variant_Source(const std::shared_ptr<Package>& p);
+    void GeneratePtrPackage_Struct_Source(const std::shared_ptr<Package>& p);
     void GeneratePackage_Json(const std::shared_ptr<Package>& p);
     void GeneratePackageModels_Header(const std::shared_ptr<Package>& p);
     void GeneratePackageModels_Source(const std::shared_ptr<Package>& p);
@@ -270,7 +274,7 @@ private:
     std::string ConvertLoggingStreamValue(const std::string& type, const std::string& name, bool optional, bool separate);
 
     std::string ConvertNamespace(const std::string& package);
-    std::string ConvertFileName(const std::string& package, FileType file_type, bool is_header, bool is_ptr = false, bool is_final = false);
+    std::string ConvertFileName(const std::string& package, FileType file_type, bool is_header, bool is_ptr = false, bool is_final = false, const std::string& suffix = "");
 };
 
 } // namespace FBE
