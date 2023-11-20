@@ -1,4 +1,4 @@
-name: Linux (ubuntu-22.04)
+name: Linux (ubuntu-latest)
 
 on:
   push:
@@ -15,9 +15,9 @@ jobs:
             env: CC=/usr/bin/clang CXX=/usr/bin/clang++
           - compiler: gcc
             env: CC=/usr/local/bin/gcc CXX=/usr/local/bin/g++
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: 'Setup required packages'
         run: | 
