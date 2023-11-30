@@ -60,6 +60,16 @@ namespace pmr = std::pmr;
 #include "string/arena_string.hpp"
 #include "container/stdb_vector.hpp"
 
+std::ostream& operator<<(std::ostream& stream, const __int128_t& val) {
+    stream << "not implement";
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const __uint128_t& val) {
+    stream << "not implement";
+    return stream;
+}
+
 namespace FBE {
     template <typename T>
     #if defined(USING_STD_VECTOR)
